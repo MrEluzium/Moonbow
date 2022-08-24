@@ -13,8 +13,8 @@ public class PlayerMovement : MonoBehaviour
     public float RunningSpeed = 3.5f;
 
     private Vector2 _movementV2 = Vector2.zero;
-    private float _facing = 0f; // Facing: 0 - down (0; -1); 1 - left (-1; 0); 2 - up (0; 1); 3 - right (1; 0); default - 0;
-    private bool _isRunning = false; // true if currently moving and MovementModifier key pressed 
+    private float _facing = 0f; // depends on current movement vector
+    private bool _isRunning = false; // false if currently moving and MovementModifier key pressed 
     private float _speedAspect; // gets value of WalkingSpeed or RunningSpeed depending on isRunning variable
 
     private Rigidbody2D _playerRigidbody;
@@ -24,12 +24,10 @@ public class PlayerMovement : MonoBehaviour
     private void Awake()
     {
         _playerRigidbody = GetComponent<Rigidbody2D>();
+        _animator = GetComponent<Animator>();
 
         _playerInput = new PlayerInputActions();
         _playerInput.Player.Enable();
-
-        _animator = GetComponent<Animator>();
-
     }
 
     void Update()
@@ -46,17 +44,15 @@ public class PlayerMovement : MonoBehaviour
         // This block won't be updated with empty (0; 0) movement vector 
         if (_movementV2.SqrMagnitude() != 0f)
         {
-            // Facing: 0 - down (0; -1); 1 - left (-1; 0); 2 - up (0; 1); 3 - right (1; 0); default - 0;
+            // Facing depends on current movement vector
+            // When moving diagonally, x orientation takes priority
+            // (0; -1) - down (0); (-1; 0) - left (1); (0; 1) - up (2); (1; 0) - right (3); default - down (0);
             if (_movementV2.x < 0) { _facing = 1; }
             else if (_movementV2.x > 0) { _facing = 3; }
             else if (_movementV2.y < 0) { _facing = 0; }
             else if (_movementV2.y > 0) { _facing = 2; }
             else { _facing = 0; }
             _animator.SetFloat("Facing", _facing);
-        }
-        else
-        {
-
         }
     }
 
